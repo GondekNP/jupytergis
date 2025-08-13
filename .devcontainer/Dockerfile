@@ -12,6 +12,7 @@ RUN groupmod --gid $USER_GID $MAMBA_USER && \
     usermod --uid $USER_UID --gid $USER_GID $MAMBA_USER && \
     chown -R $USER_UID:$USER_GID /home/$MAMBA_USER
 
+# Set the user and working directory
 USER $MAMBA_USER
 WORKDIR /home/$MAMBA_USER
 
@@ -19,6 +20,7 @@ WORKDIR /home/$MAMBA_USER
 RUN micromamba create --name jupytergis_dev -c conda-forge pip "nodejs<22" qgis -y
 
 # Copy source code and ensure proper ownership
+# TODO: Not working locally
 COPY --chown=$MAMBA_USER:$MAMBA_USER . .
 
 # Set shell to use micromamba environment
