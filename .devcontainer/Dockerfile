@@ -1,5 +1,6 @@
 FROM mambaorg/micromamba:latest
 
+# Try to force root user to avoid permission issues
 USER root
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
