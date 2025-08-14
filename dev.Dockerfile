@@ -1,4 +1,3 @@
-# FROM mambaorg/micromamba:latest
 FROM quay.io/condaforge/mambaforge
 
 # Create a fresh conda environment for jupytergis dev 
@@ -20,6 +19,7 @@ COPY python/ python/
 COPY scripts/dev-install.py scripts/dev-install.py
 
 ## TODO: This works properly when run post-install, manually, but not when run in the Dockerfile
+# Seemingly some sort of an issue with the run location (logs appear to be in the root of the container)
 # RUN python scripts/dev-install.py --target-path .
 
 # Expose JupyterLab port
