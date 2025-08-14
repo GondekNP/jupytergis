@@ -1,14 +1,19 @@
 import subprocess
 from pathlib import Path
-
+import argparse
 
 def execute(cmd: str, cwd=None):
     subprocess.run(cmd.split(" "), check=True, cwd=cwd)
 
 
-def install_dev():
-    root_path = Path(__file__).parents[1]
-    requirements_build_path = root_path / "requirements-build.txt"
+def install_dev(target_path: str = None):
+
+    if not target_path:
+        target_path = str(Path(__file__).parents[1])
+    else:
+        target_path = Path(target_path).resolve()
+
+    requirements_build_path = target_path / "requirements-build.txt"
     install_build_deps = f"python -m pip install -r {requirements_build_path}"
     install_js_deps = "jlpm install"
     build_js = "jlpm build"
@@ -20,12 +25,13 @@ def install_dev():
         "jupytergis_qgis",
     ]
 
-    execute(install_build_deps)
-    execute(install_js_deps)
-    execute(build_js)
+    execute(install_build_deps, cwd=target_path)
+    execute(install_js_deps, cwd=target_path)
+    execute(build_js, cwd=target_path)
+
     for py_package in python_packages:
         execute(f"pip uninstall {py_package} -y")
-        execute("jlpm clean:all", cwd=root_path / "python" / py_package)
+        execute("jlpm clean:all", cwd=target_path / "python" / py_package)
         execute(f"pip install -e {python_package_prefix}/{py_package}")
 
         if py_package == "jupytergis_qgis":
@@ -39,4 +45,15 @@ def install_dev():
 
 
 if __name__ == "__main__":
-    install_dev()
+
+    parser = argparse.ArgumentParser(description="Install JupyterGIS development environment.")
+    parser.add_argument(
+        "--target-path",
+        type=str,
+        default=None,
+        help="Path to the JupyterGIS repository root directory.",
+    )
+
+    args = parser.parse_args()
+
+    install_dev(target_path=args.target_path)
